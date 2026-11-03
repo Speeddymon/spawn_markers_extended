@@ -2,6 +2,7 @@ package com.spawnmarker;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
 import com.google.inject.Provides;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -101,7 +102,12 @@ public class SpawnMarkerPlugin extends Plugin {
     private ClientThread clientThread;
 
     @Inject
+    private Gson gson;
+
+    @Inject
     private SpawnMarkerConfig config;
+
+    private Gson tilePointGson;
 
     @Provides
     SpawnMarkerConfig provideConfig(ConfigManager configManager) {
@@ -110,6 +116,7 @@ public class SpawnMarkerPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
+        tilePointGson = TilePointCodec.createGson(gson);
         migrateNameFilterSettings();
         updateNpcNameFilter();
         initializeMarkerEditor();
@@ -348,7 +355,7 @@ public class SpawnMarkerPlugin extends Plugin {
             }
 
             try {
-                allPoints.addAll(TilePointCodec.deserialize(json));
+                allPoints.addAll(TilePointCodec.deserialize(tilePointGson, json));
             } catch (RuntimeException e) {
                 preserveMalformedRegion(key, json, e);
             }
@@ -365,7 +372,7 @@ public class SpawnMarkerPlugin extends Plugin {
 
         Map<String, String> replacementData = new TreeMap<>();
         for (Map.Entry<Integer, List<TilePoint>> entry : pointsByRegion.entrySet()) {
-            replacementData.put(REGION_PREFIX + entry.getKey(), TilePointCodec.serialize(entry.getValue()));
+            replacementData.put(REGION_PREFIX + entry.getKey(), TilePointCodec.serialize(tilePointGson, entry.getValue()));
         }
 
         Map<String, String> previousData = new LinkedHashMap<>();
@@ -466,7 +473,7 @@ public class SpawnMarkerPlugin extends Plugin {
             return;
         }
 
-        String json = TilePointCodec.serialize(points);
+        String json = TilePointCodec.serialize(tilePointGson, points);
         configManager.setConfiguration(CONFIG_GROUP, REGION_PREFIX + regionId, json);
     }
 
@@ -477,7 +484,7 @@ public class SpawnMarkerPlugin extends Plugin {
         }
 
         try {
-            return TilePointCodec.deserialize(json);
+            return TilePointCodec.deserialize(tilePointGson, json);
         } catch (RuntimeException e) {
             preserveMalformedRegion(REGION_PREFIX + regionId, json, e);
             log.warn("Treating malformed saved spawn markers for region {} as empty", regionId);
