@@ -33,6 +33,10 @@ public class SpawnMarkerOverlay extends Overlay {
     public Dimension render(Graphics2D graphics) {
         final Collection<ColorTileMarker> points = plugin.getPoints();
         for (final ColorTileMarker point : points) {
+            if (plugin.isNpcNameHidden(point.getLabel())) {
+                continue;
+            }
+
             WorldPoint worldPoint = point.getWorldPoint();
             if (worldPoint.getPlane() != client.getPlane()) {
                 continue;

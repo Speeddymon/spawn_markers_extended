@@ -10,25 +10,46 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = '1.6.30'
+def runeLiteVersion = project.findProperty('runeliteVersion') ?: 'latest.release'
+def lombokVersion = '1.18.30'
+
+configurations {
+	runeliteApplicationRuntime
+}
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
-	compileOnly 'org.projectlombok:lombok:1.18.4'
-	annotationProcessor 'org.projectlombok:lombok:1.18.4'
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-	testImplementation 'junit:junit:4.12'
-	testImplementation 'org.slf4j:slf4j-simple:1.7.12'
+	testImplementation 'junit:junit:4.13.2'
+	testImplementation 'org.slf4j:slf4j-simple:1.7.25'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion, {
 		exclude group: 'ch.qos.logback', module: 'logback-classic'
 	}
+	runeliteApplicationRuntime group: 'net.runelite', name:'client', version: runeLiteVersion
 }
 
-group = 'com.example'
+group = 'com.spawnmarker'
 version = '1.0-SNAPSHOT'
-sourceCompatibility = '1.8'
 
-tasks.withType(JavaCompile) {
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
+	options.release.set(11)
+}
+
+tasks.register('debugSpawnMarkers', JavaExec) {
+	group = 'application'
+	description = 'Run RuneLite with Spawn Markers Extended and wait for the VS Code debugger'
+	classpath = sourceSets.main.output + sourceSets.test.output + configurations.runeliteApplicationRuntime
+	mainClass = 'com.spawnmarker.SpawnMarkerPluginTest'
+	jvmArgs '-ea', '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:5005'
+	args '--developer-mode', '--debug'
 }
