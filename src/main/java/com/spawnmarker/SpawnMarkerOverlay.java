@@ -19,11 +19,13 @@ public class SpawnMarkerOverlay extends Overlay {
 
     private final Client client;
     private final SpawnMarkerPlugin plugin;
+    private final SpawnMarkerConfig config;
 
     @Inject
-    private SpawnMarkerOverlay(Client client, SpawnMarkerPlugin plugin) {
+    private SpawnMarkerOverlay(Client client, SpawnMarkerPlugin plugin, SpawnMarkerConfig config) {
         this.plugin = plugin;
         this.client = client;
+        this.config = config;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         setPriority(OverlayPriority.LOW);
@@ -66,7 +68,9 @@ public class SpawnMarkerOverlay extends Overlay {
             OverlayUtil.renderPolygon(graphics, poly, color);
         }
 
-        if (!Strings.isNullOrEmpty(label)) {
+        if (config.showMarkerLabels()
+                && !Strings.isNullOrEmpty(label)
+                && !plugin.isNpcLabelNameHidden(label)) {
             Point canvasTextLocation = Perspective.getCanvasTextLocation(client, graphics, lp, label, 0);
             if (canvasTextLocation != null) {
                 OverlayUtil.renderTextLocation(graphics, canvasTextLocation, label, color);

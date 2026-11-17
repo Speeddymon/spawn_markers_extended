@@ -51,6 +51,7 @@ public class SpawnMarkerPlugin extends Plugin {
     private final Set<String> malformedRegionsWarned = Collections.synchronizedSet(new HashSet<>());
     private static LocalDateTime startedUpAt;
     private volatile NpcNameFilter npcNameFilter = NpcNameFilter.disabled();
+    private volatile NpcNameFilter hiddenNpcLabelNameFilter = NpcNameFilter.denyList("");
     private volatile NpcNameFilter nonCombatNpcNameAllowList = NpcNameFilter.allowList("");
     private volatile boolean updatingMarkerEditor;
     private volatile boolean markerEditorUpdatePending;
@@ -171,6 +172,7 @@ public class SpawnMarkerPlugin extends Plugin {
         boolean enabled = Boolean.parseBoolean(event.getNewValue());
 
         if ("filterMode".equals(key) || "hiddenNpcNames".equals(key) || "allowedNpcNames".equals(key)
+                || "hiddenNpcLabelNames".equals(key)
                 || "nonCombatNpcNames".equals(key)) {
             updateNpcNameFilter();
         } else if ("clearMarkers".equals(key) && enabled) {
@@ -203,7 +205,12 @@ public class SpawnMarkerPlugin extends Plugin {
         return npcNameFilter.hides(npcName);
     }
 
+    boolean isNpcLabelNameHidden(String npcName) {
+        return hiddenNpcLabelNameFilter.hides(npcName);
+    }
+
     private void updateNpcNameFilter() {
+        hiddenNpcLabelNameFilter = NpcNameFilter.denyList(config.hiddenNpcLabelNames());
         nonCombatNpcNameAllowList = NpcNameFilter.allowList(config.nonCombatNpcNames());
         switch (config.filterMode()) {
             case DENY_LIST:
