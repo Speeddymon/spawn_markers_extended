@@ -4,6 +4,10 @@ Spawn Markers Extended records nearby NPC spawn tiles and displays persistent ti
 
 Markers are saved by region and remain saved when you disable the plugin or restart RuneLite. The plugin records each distinct tile and plane once; another NPC spawning on an already marked tile does not add a duplicate marker.
 
+Use **Show marker labels** in the plugin settings to toggle NPC names on all markers. Labels are shown by default.
+
+Use **Hide NPC name labels** to hide labels for listed NPC names while keeping their tile markers visible. Enter names with the same comma or one-per-line format as the deny list.
+
 ![Example spawn tile markers](https://user-images.githubusercontent.com/37679931/97936190-8bd1a800-1d59-11eb-91e7-0f24d8d67471.png)
 
 ## NPC name filters

@@ -14,14 +14,14 @@ public interface SpawnMarkerConfig extends Config
 	@ConfigSection(
 		name = "Combat level exceptions",
 		description = "Allow listed NPCs to bypass the combat level filter.",
-		position = 5
+		position = 7
 	)
 	String nonCombatSection = NON_COMBAT_SECTION;
 
 	@ConfigSection(
 		name = "Advanced",
 		description = "Edits are saved when focus leaves Saved markers. If malformed text is retained, right-click the Saved markers label and choose Reset to rebuild the editor from saved region data. This does not delete markers; reopen settings if the field remains blank.",
-		position = 6,
+		position = 8,
 		closedByDefault = true
 	)
 	String advancedSection = ADVANCED_SECTION;
@@ -60,10 +60,32 @@ public interface SpawnMarkerConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "showMarkerLabels",
+		name = "Show marker labels",
+		description = "Show NPC names on all saved spawn tile markers.",
+		position = 3
+	)
+	default boolean showMarkerLabels()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "hiddenNpcLabelNames",
+		name = "Hide NPC name labels",
+		description = "Hide labels for these NPC names while keeping their tile markers visible. Enter one name per line or separate names with commas.",
+		position = 4
+	)
+	default String hiddenNpcLabelNames()
+	{
+		return "";
+	}
+
+	@ConfigItem(
 		keyName = "clearMarkers",
 		name = "Clear all saved markers",
 		description = "Select to permanently delete all saved spawn markers. This control resets after it runs.",
-		position = 3
+		position = 5
 	)
 	default boolean clearMarkers()
 	{
@@ -74,7 +96,7 @@ public interface SpawnMarkerConfig extends Config
 		keyName = "clearCurrentRegionMarkers",
 		name = "Clear markers in current region",
 		description = "Delete saved markers for the region you are currently standing in, including its recovery copy. This control resets after it runs; you must be logged in.",
-		position = 4
+		position = 6
 	)
 	default boolean clearCurrentRegionMarkers()
 	{
